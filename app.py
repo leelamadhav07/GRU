@@ -3,32 +3,26 @@ import tensorflow as tf
 import numpy as np
 import pickle
 
-# ----------------------------------
+# -----------------------------------
 # LOAD MODEL
-# ----------------------------------
+# -----------------------------------
 
-model = tf.keras.models.load_model("models/lstm_model.keras")
+model = tf.keras.models.load_model("models/gru_model.keras")
 
-# ----------------------------------
+# -----------------------------------
 # LOAD SCALER
-# ----------------------------------
+# -----------------------------------
 
 with open("models/scaler.pkl", "rb") as f:
     scaler = pickle.load(f)
 
-# ----------------------------------
+# -----------------------------------
 # PAGE
-# ----------------------------------
+# -----------------------------------
 
-st.set_page_config(page_title="LSTM Forecasting", layout="centered")
+st.title("GRU Passenger Forecasting")
 
-st.title("Air Passenger Forecasting using LSTM")
-
-st.write("Enter Passenger Counts for Previous 12 Months")
-
-# ----------------------------------
-# INPUTS
-# ----------------------------------
+st.write("Predict Next Month Passengers")
 
 values = []
 
@@ -37,22 +31,18 @@ for i in range(12):
 
     values.append(value)
 
-# ----------------------------------
-# PREDICTION
-# ----------------------------------
+# -----------------------------------
+# PREDICT
+# -----------------------------------
 
-if st.button("Predict Next Month"):
+if st.button("Predict"):
     data = np.array(values).reshape(-1, 1)
 
-    # scale
+    data = scaler.transform(data)
 
-    data_scaled = scaler.transform(data)
+    data = data.reshape(1, 12, 1)
 
-    # reshape
-
-    data_scaled = data_scaled.reshape(1, 12, 1)
-
-    prediction = model.predict(data_scaled)
+    prediction = model.predict(data)
 
     prediction = scaler.inverse_transform(prediction)
 
